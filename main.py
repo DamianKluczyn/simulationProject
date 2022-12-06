@@ -4,7 +4,7 @@ import random
 from abc import ABC, abstractmethod
 from datetime import datetime
 from random import sample
-from string import ascii_letters, digits
+from string import ascii_letters
 import math
 
 class Vector2D():
@@ -25,6 +25,12 @@ class Vector2D():
     def cdot(self, param):
         return self._x * param.getComponents()[0] + self._y * param.getComponents()[1]
 
+class Randomizer:
+    def randomState(self):
+        return random.random()
+    def randomPersonInit(self):
+        return
+
 class Person(Vector2D):
     _health_options = ["odporny", "zdrowy", "objawy", "bez objawow"]
     _state = None
@@ -33,22 +39,29 @@ class Person(Vector2D):
         self._state = state
         self._position = Vector2D(x, y)
         self._speed = random.uniform(0, 2.5)
-        self._health = 0
         self._direction = Vector2D(0, 0)
-
-    def movement(self):
-        self._speed = random.uniform(0, 2.5)
-        #random direction
-        if(random.random() <= 0.5):
-             self._direction.setComponents(0, )
+        #losowanie stanu zdrowia
+        if(Randomizer.randomState() <= 0.5):
+            self._health = self._health_options[0]
         else:
-            pass
+            if(Randomizer.randomState() <= 0.2):
+                if(Randomizer.randomState() <= 0.5):
+                    self._health = self._health_options[2]
+                else:
+                    self._health = self._health_options[3]
+            else:
+                self._health = self._health_options[1]
 
-    def do_something(self) -> None:
-        print("Person is doing smth important")
-        self._state = self._generate_random_string(30)
-        print(f"Person: my state has changed to: {self._state}")
+
+
+    def movement(self, direction: Vector2D) -> None:
+        self._speed = random.uniform(0, 2.5)
+        self._direction = direction
+        self._position.setComponents(self._direction._x * self._speed, self._direction._y * self._speed)
+
+
     def save(self) -> Memento:
+        self._state = self._generate_random_string(30)
         return ConcreteMemento(self._state)
 
     def restore(self, memento: Memento) -> None:
@@ -110,5 +123,7 @@ class CareTaker:
 
 
 if __name__ == "__main__":
-    pass
+    area = Box(10,10)
+    persons = [CareTaker(Person("init",)) for i in range(0, 5)]
 #po kazdej sekundzie zapisz state na personie
+#co krok sprawdzaj odległości
